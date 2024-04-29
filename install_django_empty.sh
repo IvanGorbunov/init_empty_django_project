@@ -200,7 +200,7 @@ sed -i 's/SECRET_KEY = /SECRET_KEY = get_secret_key()   # \
 /g' ./src/settings/settings/base_settings.py
 
 sed -i 's/BASE_DIR = Path(__file__).resolve().parent.parent/ \
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent \
 ROOT_DIR = environ.Path(__file__) - 3 \
 /g' ./src/settings/settings/base_settings.py
 
