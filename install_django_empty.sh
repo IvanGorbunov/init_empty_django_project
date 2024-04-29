@@ -170,6 +170,7 @@ EOF
 cp ./src/settings/settings/.env ./src/settings/settings/.env.template
 
 echo '  - customizing base_settings.py'
+echo '  --  1' 
 sed -i 's/from pathlib import Path/import environ \
 import os \
  \
@@ -193,20 +194,25 @@ def get_secret_key(): \
     return env.str("SECRET_KEY") \
 /g' ./src/settings/settings/base_settings.py
 
+echo '  --  2'
 sed -i 's/SECRET_KEY = /SECRET_KEY = get_secret_key()   # \
 /g' ./src/settings/settings/base_settings.py
 
+echo '  --  3'
 sed -i 's/SECRET_KEY = /SECRET_KEY = get_secret_key()   # \
 /g' ./src/settings/settings/base_settings.py
 
+echo '  --  4'
 sed -i 's/BASE_DIR = Path(__file__).resolve().parent.parent/ \
 BASE_DIR = Path(__file__).resolve().parent.parent.parent \
 ROOT_DIR = environ.Path(__file__) - 3 \
 /g' ./src/settings/settings/base_settings.py
 
+echo '  --  5'
 sed -i 's/DEBUG = True/DEBUG = env.bool("DEBUG", False) \
 /g' ./src/settings/settings/base_settings.py
 
+echo '  --  6'
 sed -i 's/ALLOWED_HOSTS = []/ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS") \
 /g' ./src/settings/settings/base_settings.py
 
