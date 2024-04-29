@@ -206,7 +206,7 @@ echo '  --  4'
 sed -i 's/DEBUG = True/DEBUG = env.bool("DEBUG", False)/g' ./src/settings/settings/base_settings.py
 
 echo '  --  5'
-sed -i 's/ALLOWED_HOSTS = []/ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")/g' ./src/settings/settings/base_settings.py
+sed -i 's/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")/g' ./src/settings/settings/base_settings.py
 
 
 echo 'Creation finished successfully!'
