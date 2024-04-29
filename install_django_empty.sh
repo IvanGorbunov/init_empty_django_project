@@ -4,7 +4,7 @@
 set -o errexit
 
 # Delete old repo
-rm ./.git
+rm -rf ./.git
 rm ./README.md
 
 # Install the Git
