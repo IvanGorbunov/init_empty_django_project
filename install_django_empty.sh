@@ -167,8 +167,8 @@ EOF
 
 cp ./src/settings/settings/.env ./src/settings/settings/.env.template
 
-echo '  - customizing base_settings.py'
-echo '  --  1' 
+echo '  - customizing base_settings.py:'
+echo '    -  1' 
 sed -i 's/from pathlib import Path/import environ \
 import os \
  \
@@ -192,19 +192,32 @@ def get_secret_key(): \
     return env.str("SECRET_KEY") \
 /g' ./src/settings/settings/base_settings.py
 
-echo '  --  2'
+echo '    -  2'
 sed -i 's/SECRET_KEY = /SECRET_KEY = get_secret_key()   #/g' ./src/settings/settings/base_settings.py
 
-echo '  --  3'
+echo '    -  3'
 sed -i 's/BASE_DIR = Path(__file__).resolve().parent.parent/BASE_DIR = Path(__file__).resolve().parent.parent.parent \
 ROOT_DIR = environ.Path(__file__) - 3 \
 /g' ./src/settings/settings/base_settings.py
 
-echo '  --  4'
+echo '    -  4'
 sed -i 's/DEBUG = True/DEBUG = env.bool("DEBUG", False)/g' ./src/settings/settings/base_settings.py
 
-echo '  --  5'
+echo '    -  5'
 sed -i 's/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")/g' ./src/settings/settings/base_settings.py
 
+echo '    -  6'
+sed -i 's/ROOT_URLCONF = "'$project_name'.urls"/ROOT_URLCONF = "settings.urls"/g' ./src/settings/settings/base_settings.py
+
+echo '    -  7'
+sed -i 's/WSGI_APPLICATION = "'$project_name'.wsgi.application"/WSGI_APPLICATION = "settings.wsgi.application"/g' ./src/settings/settings/base_settings.py
+
+echo '  - customizing project`s files:'
+
+echo '    - asgi.py'
+sed -i 's/'$project_name'.settings/settings.settings"/g' ./src/settings/asgi.py
+
+echo '    - wsgi.py'
+sed -i 's/'$project_name'.settings/settings.settings"/g' ./src/settings/asgi.py
 
 echo 'Creation finished successfully!'
