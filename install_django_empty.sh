@@ -3,7 +3,12 @@
 
 set -o errexit
 
-# Install the Git command line extension
+# Delete old repo
+rm ./.git
+rm ./README.md
+
+# Install the Git
+git init
 git lfs install
 
 project_name=$1
