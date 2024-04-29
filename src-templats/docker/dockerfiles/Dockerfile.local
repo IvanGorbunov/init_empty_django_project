@@ -1,0 +1,48 @@
+FROM python:3.12
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# set work directory
+WORKDIR /clients_portal
+
+# install dependences
+RUN python3 -m pip install --upgrade pip
+RUN pip install poetry
+RUN poetry self update
+
+COPY pyproject.toml /clients_portal/pyproject.toml
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi
+
+## install google chrome
+#RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+#RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+#RUN apt-get -y update
+#RUN apt-get install -y google-chrome-stable
+
+## install chromedriver
+#RUN apt-get install -yqq unzip
+#RUN wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
+#RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
+#COPY /usr/local/bin/chromedriver /clients_portal/src/functional_tests/
+
+#RUN apt-get install gettext -y
+
+# set display port to avoid crash
+ENV DISPLAY=:99
+
+# set open port
+EXPOSE 8025
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,99 @@
+# name of our workflow
+name: Django CI/CD Workflow
+
+# triggers for our workflow
+on:
+  # opening a pull request
+  pull_request:
+    branches:
+      - '**'
+  # any code pushed
+  push:
+    branches:
+      - '**'
+
+# three job definition
+jobs:
+  health-check-job: # health check job for testing and code formatting check
+    runs-on: ubuntu-latest # os for running the job
+    env:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: localhost # default host value for the database
+      POSTGRES_DB: clients_portal
+      POSTGRES_PORT: 5432
+      DJANGO_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+    services:
+      postgres_main:
+        image: postgres
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
+    steps:
+      - name: Checkout code # checking our the code at current commit that triggers the workflow
+        uses: actions/checkout@v3
+#      - name: Cache dependency # caching dependency will make our build faster.
+#        uses: actions/cache@v3 # for more info checkout pip section documentation at https://github.com/actions/cache
+#        with:
+#          path: ~/.cache/pip
+#          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+#          restore-keys: |
+#            ${{ runner.os }}-pip-
+      - name: Setup python environment # setting python environment to 3.x
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.12' # if you want multiple python version run just use matrix strategy in job config. See the documentation of GitHub Actions
+      - name: Check Python version # checking the python version to see if 3.x is installed.
+        run: python --version
+      - name: Upgrade Pip # check and upgrade Pip
+        run: python -m pip install --upgrade pip
+      - name: Install Poetry # install Poetry
+        run: |
+          pip install poetry
+          poetry self update
+      - name: Install dependencies # install application dependencies
+        run: poetry install
+      - name: Check Syntax # check code formatting
+        run: |
+          poetry add pycodestyle
+          poetry run pycodestyle --exclude=./src/utils/validators.py --statistics --max-line-length=500 .
+      - name: Check syntax with flake8
+        run: |
+          poetry add flake8
+          poetry run flake8
+#      - name: Check syntax with Mypy # run Mypy
+#        run: poetry run mypy ./src
+#      - name: Check syntax with pylint # run pylint
+#        run: poetry run pylint ./src/
+      - name: Checking hierarchy
+        run: |
+          sudo apt install tree
+          tree -L 3
+
+      - name: Run Migrations and Tests
+        run: |
+          wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
+          unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
+          cp /usr/local/bin/chromedriver ./src/functional_tests/chromedriver_109
+          touch ./src/settings/.env
+          echo DEBUG=True >> ./src/settings/.env
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> ./src/settings/.env
+          echo STATIC_ROOT=var/www/staticfiles >> ./src/settings/.env
+          echo SQL_ENGINE=${{ secrets.POSTGRES_PASSWORD }} >> ./src/settings/.env
+          echo SQL_USER=postgres >> ./src/settings/.env
+          echo SQL_PASSWORD=postgres >> ./src/settings/.env
+          echo SQL_DATABASE=${{ env.POSTGRES_DB }} >> ./src/settings/.env
+          echo SQL_PORT=${{ env.POSTGRES_PORT }} >> ./src/settings/.env
+          echo SENTRY_DSN=${{ secrets.SENTRY_DSN }} >> ./src/settings/.env
+          echo CELERY_ACCEPT_CONTENT=application/json >> ./src/settings/.env
+          cd src/
+          poetry run python manage.py test apps/
+#          python manage.py test apps/ functional_tests

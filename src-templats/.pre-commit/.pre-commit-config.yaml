@@ -1,0 +1,21 @@
+repos:
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+        args: [
+          "--profile",
+          "black",
+          "--filter-files",
+          "--combine-as",
+          "--src",
+          "simple_backend"
+        ]
+        files: \.pyi?$
+  - repo: https://github.com/psf/black
+    rev: 22.10.0
+    hooks:
+      - id: black
+        args: ["--target-version", "py312", "--line-length", "100"]
+        files: \.pyi?$
+        types: []
