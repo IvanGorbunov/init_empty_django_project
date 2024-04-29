@@ -88,12 +88,13 @@ poetry add Django \
 # Install pre-commit hooks
 pre-commit install
 poetry add pre-commit
+cp -r ./src-templats/.pre-commit ./.pre-commit
 
 # Docker hooks
-# pre-commit install -c simple_backend/_dev/.pre-commit/docker.pre-commit-config.yaml
+# pre-commit install -c ./.pre-commit/docker.pre-commit-config.yaml
 
 # Local hooks
-pre-commit install -c ./src-templats/.pre-commit/.pre-commit-config.yaml
+pre-commit install -c ./.pre-commit/.pre-commit-config.yaml
 
 
 # Customize the project
@@ -220,4 +221,8 @@ sed -i 's/'$project_name'.settings/settings.settings"/g' ./src/settings/asgi.py
 echo '    - wsgi.py'
 sed -i 's/'$project_name'.settings/settings.settings"/g' ./src/settings/asgi.py
 
+echo 'Cleaning...'
+rm -rf ./src-templats
+
 echo 'Creation finished successfully!'
+echo 'rm -rf ./install_django_empty.sh'
