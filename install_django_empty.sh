@@ -25,7 +25,7 @@ cp -r ./src-templats/docker ./
 cp -r ./src-templats/.github ./
 
 # Install Python .venv
-python3.12 -m venv .venv --upgrade-deps
+python3.12 -m venv venv --upgrade-deps
 . .venv/bin/activate
 
 
