@@ -1,36 +1,71 @@
 #!/bin/bash
+
 # Install empty default Django poject
 
 set -o errexit
 
 # Delete old repo
+echo 'Clean folder...'
 rm -rf ./.git
 rm ./README.md
 
 # Install the Git
+echo 'Install the Git...'
 git init
 git lfs install
 
-project_name=$1
+# Init settings
+echo 'Init settings...'
+project_name=""
 project_description=""
 project_author="IvanGorbunov <falseprogrammerfirst@gmail.com>"
 project_version="0.1.0"
 #project_license=$5
 project_readme="README.md"
 
+deploy=false
 
+# Chekking flags
+while [ -n "$1" ] 
+do
+  case "$1" in
+    -g) deploy=true;;
+    -n) project_name="$2" 
+    shift ;;
+    --) shift 
+    break ;;
+    *) echo "$1 is not an option";;
+  esac
+  shift
+done
+
+# Chekking value "--proj-name"
+if [ -z "$project_name" ]; then
+  echo "Erorr: not set name of the project (--proj-name)"
+  exit 1
+fi
+
+if [ "$project_name" = "-g" ]; then
+  echo "Erorr: not set name of the project (-n)"
+  exit 1
+fi
+
+# Copy system files
+echo 'Copy system files...'
 cp ./src-templats/.gitignore ./
 cp ./src-templats/.dockerignore ./
 cp -r ./src-templats/docker ./
 cp -r ./src-templats/.github ./
 
 # Install Python .venv
+echo 'Install Python...'
 python3.12 -m venv venv --upgrade-deps
 . ./venv/bin/activate
 
 
 
 # Install Poetry
+echo 'Install Poetry...'
 cat << EOF > pyproject.toml
 [tool.poetry]
 name = "$project_name"
@@ -53,6 +88,7 @@ poetry self update
 # poetry init
 
 # Install Django
+echo 'Install Django...'
 poetry add Django \
     psycopg2-binary \
     environ django-environ \
@@ -86,6 +122,7 @@ poetry add Django \
 # #pip install '.[dev]'
 
 # Install pre-commit hooks
+echo 'Install pre-commit hooks...'
 pre-commit install
 poetry add pre-commit
 cp -r ./src-templats/.pre-commit ./.pre-commit
@@ -113,7 +150,6 @@ mkdir -p ./src/settings/settings
 mv ./src/settings/settings.py ./src/settings/settings/base_settings.py
 echo 'from .base_settings import *' >> ./src/settings/settings/local_settings.py
 echo 'from .base_settings import *' >> ./src/settings/settings/prod_settings.py
-sed -i 's/'$project_name'.settings/settings.settings.prod_settings/g' ./src/manage.py
 
 echo '  - adding .env-files'
 cat << EOF > ./src/settings/settings/.env
@@ -215,11 +251,20 @@ sed -i 's/WSGI_APPLICATION = "'$project_name'.wsgi.application"/WSGI_APPLICATION
 
 echo '  - customizing project`s files:'
 
+echo '    - manage.py'
+sed -i 's/'$project_name'.settings/settings.settings.prod_settings/g' ./src/manage.py
+
 echo '    - asgi.py'
-sed -i 's/'$project_name'.settings/settings.settings"/g' ./src/settings/asgi.py
+sed -i 's/'$project_name'.settings/settings.settings.prod_settings/g' ./src/settings/asgi.py
 
 echo '    - wsgi.py'
-sed -i 's/'$project_name'.settings/settings.settings"/g' ./src/settings/asgi.py
+sed -i 's/'$project_name'.settings/settings.settings.prod_settings/g' ./src/settings/asgi.py
+
+# Install Gunicorn
+if [ "$deploy" = true ]; then
+  echo "Install Gunicorn..."
+  ./deploy/install.sh
+fi
 
 echo 'Cleaning...'
 rm -rf ./src-templats
