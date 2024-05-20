@@ -258,7 +258,7 @@ echo '    - asgi.py'
 sed -i 's/'$project_name'.settings/settings.settings.prod_settings/g' ./src/settings/asgi.py
 
 echo '    - wsgi.py'
-sed -i 's/'$project_name'.settings/settings.settings.prod_settings/g' ./src/settings/asgi.py
+sed -i 's/'$project_name'.settings/settings.settings.prod_settings/g' ./src/settings/wsgi.py
 
 # Install Gunicorn
 if [ "$deploy" = true ]; then
