@@ -89,27 +89,27 @@ poetry self update
 
 # Install Django
 echo 'Install Django...'
-poetry add Django \
-    psycopg2-binary \
-    environ django-environ \
-    drf-yasg django-debug-toolbar \
-    redis celery flower django-redis django-celery-beat django-celery-results \
-    coverage django-coverage-plugin \
-    django-admin-extra-buttons django-admin-rangefilter \
-    django-constrainedfilefield django-timezone-field\
-    django-cors-headers \
-    django-crispy-forms \
-    django-filter django-daterangefilter \
-    django-otp \
-    django-storages \
-    factory-boy django-test-plus \
-    django-treebeard \
-    djangorestframework djangorestframework-simplejwt drf-writable-nested \
-    flake8 \
-    black \
-    openpyxl \
-    Pillow \
-    requests
+poetry add django \
+	psycopg2-binary \
+	environ django-environ \
+	drf-yasg \
+	redis celery flower django-redis django-celery-beat django-celery-results \
+	django-admin-extra-buttons django-admin-rangefilter \
+	django-constrainedfilefield django-timezone-field \
+	django-cors-headers \
+	django-crispy-forms \
+	django-filter django-daterangefilter \
+	django-otp \
+	django-storages \
+	django-treebeard \
+	djangorestframework djangorestframework-simplejwt drf-writable-nested \
+	requests \
+	boto3 botocore \
+	setuptools \
+	gunicorn
+
+poetry add django-debug-toolbar black flake8  --group dev
+poetry add coverage django-coverage-plugin factory-boy django-test-plus --group test
 
 # poetry add django-bootstrap5
 # poetry add selenium
